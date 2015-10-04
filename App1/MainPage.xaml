@@ -8,11 +8,15 @@
     x:Class="App1.MainPage"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Loaded="Page_Loaded">
-
+    <Page.BottomAppBar>
+        <CommandBar>
+            <AppBarButton x:Name="btnZoomIn" Icon="ZoomIn" Label="Zoom in" Click="btnZoomIn_Click"/>
+            <AppBarButton x:Name="btnZoomOut" Icon="ZoomOut" Label="Zoom out" Click="btnZoomOut_Click"/>
+            <AppBarButton x:Name="btnOnMe" Icon="Target" Label="On me" Click="btnOnMe_Click"/>
+            <AppBarButton x:Name="btnSearh" Icon="Find" Label="Search" Click="btnSearh_Click"/>
+        </CommandBar>
+    </Page.BottomAppBar>
 
     <Maps:MapControl x:Name="myMap"
-                      MapServiceToken="AsCaoqoc5VNLKNJhChJvgyez0XSgG6ge2O39m-TgkpgZ38hYRszjKfJBtfzuXDtz"
-                     HorizontalAlignment="Left" Height="640" VerticalAlignment="Top" Width="399.999969482422"/>
-
-
+                      MapServiceToken="AsCaoqoc5VNLKNJhChJvgyez0XSgG6ge2O39m-TgkpgZ38hYRszjKfJBtfzuXDtz" Margin="0"/>
 </Page>

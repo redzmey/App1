@@ -24,6 +24,7 @@ namespace App1
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private List<OmnivaLocation> _models;
         public MainPage()
         {
             InitializeComponent();
@@ -87,7 +88,7 @@ namespace App1
         private void DrawLocations(StreamReader sRead)
         {
             var configuration = new CsvConfiguration {Delimiter = ";"};
-            var models = new List<OmnivaLocation>();
+            _models = new List<OmnivaLocation>();
             using (var reader = new CsvReader(sRead, configuration))
             {
                 while (reader.Read())
@@ -100,10 +101,10 @@ namespace App1
                         YCoordinate = reader.GetField<double>("Y_COORDINATE"),
                         CountryCode = reader.GetField("A0_NAME")
                     };
-                    models.Add(location);
+                    _models.Add(location);
                 }
             }
-            foreach (var model in models.Where(x=>x.CountryCode=="EE"))
+            foreach (var model in _models.Where(x=>x.CountryCode=="EE"))
             {
                 SetPin(model.YCoordinate, model.XCoordinate, model.Name);
             }
@@ -182,6 +183,48 @@ namespace App1
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             // todo load buttons
+        }
+
+        private void btnOnMe_Click(object sender, RoutedEventArgs e)
+        {
+            SetMyLocation();
+        }
+
+        private void btnZoomIn_Click(object sender, RoutedEventArgs e)
+        {
+            if (myMap.ZoomLevel < 20)
+                myMap.ZoomLevel = ++myMap.ZoomLevel;
+        }
+
+        private void btnZoomOut_Click(object sender, RoutedEventArgs e)
+        {
+            if (myMap.ZoomLevel > 1)
+                myMap.ZoomLevel = --myMap.ZoomLevel;
+        }
+
+        private async void btnSearh_Click(object sender, RoutedEventArgs e)
+        {
+            SearchDialog searchDialog = new SearchDialog();
+            await searchDialog.ShowAsync();
+            string seachString = searchDialog.searchString.ToLower();
+            if (!string.IsNullOrWhiteSpace(seachString))
+            {
+                myMap.MapElements.Clear();
+                List<OmnivaLocation> filteredLocations = _models.Where(x => x.Name.ToLower().Contains(seachString)).ToList();
+                foreach (var model in filteredLocations)
+                    SetPin(model.YCoordinate, model.XCoordinate, model.Name);
+
+                if (filteredLocations.Any())
+                {
+                    BasicGeoposition position = new BasicGeoposition()
+                    {
+                        Latitude = filteredLocations[0].YCoordinate,
+                        Longitude = filteredLocations[0].XCoordinate
+                    };
+                    myMap.Center = new Geopoint(position);
+                    myMap.ZoomLevel = 18;
+                }
+            }
         }
     }
 }
