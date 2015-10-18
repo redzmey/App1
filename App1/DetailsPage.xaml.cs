@@ -38,7 +38,8 @@ namespace App1
             _details = (OmnivaLocation) e.Parameter;
             if (_details != null)
             {
-                tbxDescription.Text = _details.Name; 
+                tbxDescription.Text = _details.Name;
+                tbxServiceHours.Text = _details.ServiceHours;
             }
         }
     }

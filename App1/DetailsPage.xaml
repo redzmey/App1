@@ -7,11 +7,16 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.BottomAppBar>
+        <CommandBar>
+            <AppBarButton Icon="Back" Label="Back" IsHoldingEnabled="False" IsRightTapEnabled="False" IsDoubleTapEnabled="False"/>
+            <AppBarButton Icon="Globe" Label="Navigate to"/>
+        </CommandBar>
+    </Page.BottomAppBar>
 
-    <Grid>
-        <TextBlock Margin="0,5,0,0" Text="{Binding PostName}"  Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Center" TextWrapping="Wrap"  Foreground="#0094ca" FontFamily="Segoe WP"   FontSize="28" ></TextBlock>
+    <StackPanel>
+        <TextBlock Name="tbxDescription" Text="Name" Margin="0,15,0,0" Grid.Row="4" VerticalAlignment="Top" HorizontalAlignment="Left" TextWrapping="Wrap"  Foreground="#0094ca" FontFamily="Segoe WP"   FontSize="23" ></TextBlock>
+        <TextBlock x:Name="tbxServiceHours" HorizontalAlignment="Left" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" FontFamily="Segoe WP"   FontSize="20"/>
 
-        <TextBlock Name="tbxDescription" Text="Opening hours" Margin="0,15,0,0" Grid.Row="4" VerticalAlignment="Top" HorizontalAlignment="Left" TextWrapping="Wrap"  Foreground="#0094ca" FontFamily="Segoe WP"   FontSize="23" ></TextBlock>
-
-    </Grid>
+    </StackPanel>
 </Page>

@@ -116,7 +116,15 @@ namespace App1
                         XCoordinate = reader.GetField<double>("X_COORDINATE"),
                         YCoordinate = reader.GetField<double>("Y_COORDINATE"),
                         CountryCode = reader.GetField("A0_NAME"),
-                        Type = reader.GetField<int>("TYPE")
+                        A1Name = reader.GetField("A1_NAME"),
+                        A2Name = reader.GetField("A2_NAME"),
+                        A3Name = reader.GetField("A3_NAME"),
+                        A4Name = reader.GetField("A4_NAME"),
+                        A5Name = reader.GetField("A5_NAME"),
+                        A6Name = reader.GetField("A6_NAME"),
+                        A7Name = reader.GetField("A7_NAME"),
+                        Type = reader.GetField<int>("TYPE"),
+                        ServiceHours = reader.GetField("SERVICE_HOURS"),
                     };
                     _models.Add(location);
                 }
@@ -225,19 +233,19 @@ namespace App1
                 myMap.ZoomLevel = --myMap.ZoomLevel;
         }
 
-        private void Pushpin_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            ShowPushpinContent((OmnivaLocation) sender);
-        }
+        //private void Pushpin_Tapped(object sender, TappedRoutedEventArgs e)
+        //{
+        //    ShowPushpinContent((OmnivaLocation) sender);
+        //}
 
-        private void ShowPushpinContent(OmnivaLocation model)
-        {
-            PushpinPopup.IsOpen = false;
-            PushpinPopup.DataContext = model;
-            PushpinPopup.IsOpen = true;
-            myMap.Center = model.Location;
-            // _currentModel = model;
-        }
+        //private void ShowPushpinContent(OmnivaLocation model)
+        //{
+        //    PushpinPopup.IsOpen = false;
+        //    PushpinPopup.DataContext = model;
+        //    PushpinPopup.IsOpen = true;
+        //    myMap.Center = model.Location;
+        //    // _currentModel = model;
+        //}
 
         private async void btnSearh_Click(object sender, RoutedEventArgs e)
         {
@@ -252,7 +260,7 @@ namespace App1
                 foreach (var model in filteredLocations)
                     SetPin(model);
 
-                if (filteredLocations.Any())
+                if (filteredLocations.Count==1)
                 {
                     var position = new BasicGeoposition
                     {
