@@ -7,10 +7,10 @@ using Windows.Devices.Geolocation;
 using Windows.Foundation;
 using Windows.Networking.Connectivity;
 using Windows.Storage;
-using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Maps;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Navigation;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -24,7 +24,10 @@ namespace App1
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private OmnivaLocation _currentModel;
         private List<OmnivaLocation> _models;
+        private Bounds _visibleArea;
+
         public MainPage()
         {
             InitializeComponent();
@@ -50,6 +53,7 @@ namespace App1
             // this event is handled for you
 
             // 
+            _visibleArea = new Bounds();
             DoMe();
         }
 
@@ -73,7 +77,6 @@ namespace App1
                 var client = new HttpClient();
                 var places = await client.GetStringAsync("http://www.omniva.ee/locations.csv");
                 sRead = new StreamReader(GenerateStreamFromString(places));
-                //todo overwrite local file
             }
             else
             {
@@ -83,6 +86,19 @@ namespace App1
             SetMyLocation();
 
             DrawLocations(sRead);
+        }
+
+        private async void UpdateFile()
+        {
+            if (NetworkInformation.GetInternetConnectionProfile().GetNetworkConnectivityLevel() <
+                NetworkConnectivityLevel.InternetAccess) return;
+            var client = new HttpClient();
+            var places = await client.GetStringAsync("http://www.omniva.ee/locations.csv");
+            var sRead = new StreamReader(GenerateStreamFromString(places));
+
+            var file = await StorageFile.GetFileFromApplicationUriAsync(new Uri(@"ms-appx:///OmnivaLocations.csv"));
+            var sWrite = new StreamWriter(await file.OpenStreamForWriteAsync());
+            await sWrite.WriteAsync(sRead.ReadToEnd());
         }
 
         private void DrawLocations(StreamReader sRead)
@@ -99,41 +115,48 @@ namespace App1
                         Zip = reader.GetField("ZIP"),
                         XCoordinate = reader.GetField<double>("X_COORDINATE"),
                         YCoordinate = reader.GetField<double>("Y_COORDINATE"),
-                        CountryCode = reader.GetField("A0_NAME")
+                        CountryCode = reader.GetField("A0_NAME"),
+                        Type = reader.GetField<int>("TYPE")
                     };
                     _models.Add(location);
                 }
             }
-            foreach (var model in _models.Where(x=>x.CountryCode=="EE"))
+
+            if (myMap.Children.Count != 0)
             {
-                SetPin(model.YCoordinate, model.XCoordinate, model.Name);
+                var pushpin = myMap.Children.FirstOrDefault(p => (p.GetType() == typeof (OmnivaLocation)));
+
+                if (pushpin != null)
+                    myMap.Children.Remove(pushpin);
             }
+
+            foreach (var model in _models.Where(x => x.CountryCode == "EE"))
+                SetPin(model);
         }
 
-        private void SetPin(double latitude, double longitude, string name, bool myLocation = false)
+        private void SetPin(OmnivaLocation location, bool myLocation = false)
         {
-            //var pinLocation = new Geopoint(new BasicGeoposition() { Latitude = latitude, Longitude = longitude });
-            //var youPin = CreatePin();
-            //myMap.Children.Add(youPin);
-            //MapControl.SetLocation(youPin, pinLocation);
-            //MapControl.SetNormalizedAnchorPoint(youPin, new Point(0.0, 1.0));
-
-            var iconPath = "ms-appx:///Assets/location-icon.png";
+            string iconPath;
             if (myLocation)
                 iconPath = "ms-appx:///Assets/youarehere.png";
 
-            var mapIcon = new MapIcon
+            switch (location.Type)
             {
-                Image = RandomAccessStreamReference.CreateFromUri(new Uri(iconPath)),
-                Title = name,
-                Location = new Geopoint(new BasicGeoposition
-                {
-                    Latitude = latitude,
-                    Longitude = longitude
-                }),
-                NormalizedAnchorPoint = new Point(0.5, 0.5)
-            };
-            myMap.MapElements.Add(mapIcon);
+                case 0:
+                    iconPath = "ms-appx:///Assets/omniva_a_location.png";
+                    break;
+                case 1:
+                    iconPath = "ms-appx:///Assets/omniva_p_location.png";
+                    break;
+                default:
+                    iconPath = "ms-appx:///Assets/location-icon.png";
+                    break;
+            }
+
+            var mapIcon = new LocationPin {ImagePath = iconPath, Details = location}; //iconPath,name
+            myMap.Children.Add(mapIcon);
+            MapControl.SetLocation(mapIcon, location.Location);
+            MapControl.SetNormalizedAnchorPoint(mapIcon, new Point(0.5, 0.5));
         }
 
         public async void SetMyLocation()
@@ -162,7 +185,7 @@ namespace App1
                 position.Latitude = geoposition.Coordinate.Latitude;
                 position.Longitude = geoposition.Coordinate.Longitude;
             #endif
-                SetPin(position.Latitude, position.Longitude, "You are here", true);
+                //SetPin(position.Latitude, position.Longitude, "You are here", 3,true);
                 myMap.Center = new Geopoint(position);
                 myMap.ZoomLevel = 18;
             }
@@ -202,21 +225,36 @@ namespace App1
                 myMap.ZoomLevel = --myMap.ZoomLevel;
         }
 
+        private void Pushpin_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            ShowPushpinContent((OmnivaLocation) sender);
+        }
+
+        private void ShowPushpinContent(OmnivaLocation model)
+        {
+            PushpinPopup.IsOpen = false;
+            PushpinPopup.DataContext = model;
+            PushpinPopup.IsOpen = true;
+            myMap.Center = model.Location;
+            // _currentModel = model;
+        }
+
         private async void btnSearh_Click(object sender, RoutedEventArgs e)
         {
-            SearchDialog searchDialog = new SearchDialog();
+            var searchDialog = new SearchDialog();
             await searchDialog.ShowAsync();
-            string seachString = searchDialog.searchString.ToLower();
+            var seachString = searchDialog.searchString.ToLower();
             if (!string.IsNullOrWhiteSpace(seachString))
             {
                 myMap.MapElements.Clear();
-                List<OmnivaLocation> filteredLocations = _models.Where(x => x.Name.ToLower().Contains(seachString)).ToList();
+                var filteredLocations =
+                    _models.Where(x => x.Name.ToLower().Contains(seachString)).ToList();
                 foreach (var model in filteredLocations)
-                    SetPin(model.YCoordinate, model.XCoordinate, model.Name);
+                    SetPin(model);
 
                 if (filteredLocations.Any())
                 {
-                    BasicGeoposition position = new BasicGeoposition()
+                    var position = new BasicGeoposition
                     {
                         Latitude = filteredLocations[0].YCoordinate,
                         Longitude = filteredLocations[0].XCoordinate
@@ -225,6 +263,37 @@ namespace App1
                     myMap.ZoomLevel = 18;
                 }
             }
+        }
+
+        private void myMap_ZoomLevelChanged(MapControl sender, object args)
+        {
+            //todo count models in bounds
+            //   if (_models == null) return;
+
+            //   if (MapBoundsArea != null)
+            //     {
+            //int count = _models.Count(location => location.IsPointInside(_visibleArea));
+            //btnCount.Label = count.ToString();
+            //   }
+        }
+
+
+        public class Bounds
+        {
+            public double East { get; set; }
+            public double West { get; set; }
+            public double North { get; set; }
+            public double South { get; set; }
+        }
+
+        private void btnCount_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void BtnUpdate_OnClick(object sender, RoutedEventArgs e)
+        {
+           UpdateFile();
         }
     }
 }

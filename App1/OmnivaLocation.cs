@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Devices.Geolocation;
+
 namespace App1
 {
-  public  class OmnivaLocation
+    public class OmnivaLocation: BaseLocation
     {
         public string Zip { get; set; }
-        public string Name { get; set; }
-        public string Type { get; set; }
+        public int Type { get; set; }
         public string CountryCode { get; set; }
         public string A1Name { get; set; }
         public string A2Name { get; set; }
@@ -19,8 +20,6 @@ namespace App1
         public string A6Name { get; set; }
         public string A7Name { get; set; }
         public string A8Name { get; set; }
-        public double XCoordinate { get; set; }
-        public double YCoordinate { get; set; }
         public string ServiceHours { get; set; }
         public string TempServiceHours { get; set; }
         public string TempServiceHoursUntil { get; set; }

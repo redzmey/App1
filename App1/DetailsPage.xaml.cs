@@ -22,6 +22,7 @@ namespace App1
     /// </summary>
     public sealed partial class DetailsPage : Page
     {
+        private OmnivaLocation _details;
         public DetailsPage()
         {
             this.InitializeComponent();
@@ -34,7 +35,11 @@ namespace App1
         /// This parameter is typically used to configure the page.</param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            _details = (OmnivaLocation) e.Parameter;
+            if (_details != null)
+            {
+                tbxDescription.Text = _details.Name; 
+            }
         }
-
     }
 }

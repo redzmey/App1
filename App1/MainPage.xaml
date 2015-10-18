@@ -10,13 +10,35 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Loaded="Page_Loaded">
     <Page.BottomAppBar>
         <CommandBar>
-            <AppBarButton x:Name="btnZoomIn" Icon="ZoomIn" Label="Zoom in" Click="btnZoomIn_Click"/>
+            <CommandBar.PrimaryCommands>
+                <AppBarButton x:Name="btnZoomIn" Icon="ZoomIn" Label="Zoom in" Click="btnZoomIn_Click"/>
             <AppBarButton x:Name="btnZoomOut" Icon="ZoomOut" Label="Zoom out" Click="btnZoomOut_Click"/>
             <AppBarButton x:Name="btnOnMe" Icon="Target" Label="On me" Click="btnOnMe_Click"/>
+        </CommandBar.PrimaryCommands>
+            <CommandBar.SecondaryCommands>
             <AppBarButton x:Name="btnSearh" Icon="Find" Label="Search" Click="btnSearh_Click"/>
-        </CommandBar>
+                <AppBarButton x:Name="btnUpdate" Label="Update" Click="BtnUpdate_OnClick"/>
+            </CommandBar.SecondaryCommands>
+            </CommandBar>
     </Page.BottomAppBar>
 
     <Maps:MapControl x:Name="myMap"
-                      MapServiceToken="AsCaoqoc5VNLKNJhChJvgyez0XSgG6ge2O39m-TgkpgZ38hYRszjKfJBtfzuXDtz" Margin="0"/>
+                      MapServiceToken="AsCaoqoc5VNLKNJhChJvgyez0XSgG6ge2O39m-TgkpgZ38hYRszjKfJBtfzuXDtz" Margin="0" ZoomLevelChanged="myMap_ZoomLevelChanged">
+        <Popup x:Name="PushpinPopup" IsLightDismissEnabled="True" DataContext="{Binding}" Tag="{Binding}">
+            <Border BorderBrush="#F08D45" BorderThickness="1">
+                <Grid Background="White" Width="300"  >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="0" Background="#F08D45">
+                        <TextBlock Grid.Row="0" Foreground="White" FontSize="16" FontWeight="Bold" Text="{Binding Name}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10" />
+                    </StackPanel>
+                    <StackPanel Grid.Row="1" Orientation="Vertical" Margin="15">
+
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Popup>
+    </Maps:MapControl>
 </Page>
