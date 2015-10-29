@@ -15,8 +15,9 @@
     </Page.BottomAppBar>
 
     <StackPanel>
-        <TextBlock Name="tbxDescription" Text="Name" Margin="0,15,0,0" Grid.Row="4" Style="{ThemeResource HeaderTextBlockStyle}"  FontSize="23" ></TextBlock>
-        <TextBlock x:Name="tbxServiceHours" HorizontalAlignment="Left" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" FontFamily="Segoe WP"   FontSize="20"/>
+        <TextBlock Name="tbxDescription" Text="Name" Margin="0,15,0,0" Grid.Row="4" Style="{ThemeResource HeaderTextBlockStyle}"  FontSize="23" Foreground="{ThemeResource ListBoxItemSelectedBackgroundThemeBrush}" ></TextBlock>
+        <TextBlock x:Name="tbxServiceHours" HorizontalAlignment="Left" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" FontFamily="Segoe WP"   FontSize="20" Padding="0,20,0,0"/>
+        <TextBlock x:Name="tbxFullAddress" HorizontalAlignment="Left" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" FontFamily="Segoe WP"   FontSize="20" Margin="0" Padding="0,20,0,0"/>
 
     </StackPanel>
 </Page>

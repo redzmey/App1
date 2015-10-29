@@ -15,5 +15,7 @@ namespace App1
             Latitude = YCoordinate,
             Longitude = XCoordinate
         });
+
+        public int Type { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using App1.Common;
+using App1.Models;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
@@ -28,10 +29,13 @@ namespace App1
         /// This parameter is typically used to configure the page.</param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            if (e.Parameter?.GetType() != typeof (OmnivaLocation))
+                return;
             _details = (OmnivaLocation) e.Parameter;
             if (_details != null)
             {
                 tbxDescription.Text = _details.Name;
+                tbxFullAddress.Text = _details.FullAddress;
                 tbxServiceHours.Text = _details.ServiceHours;
             }
         }
@@ -45,7 +49,7 @@ namespace App1
 
         private void btnBack_Click(object sender, RoutedEventArgs e)
         {
-
+            Frame.GoBack();
         }
     }
 }

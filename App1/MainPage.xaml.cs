@@ -12,6 +12,8 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Maps;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Navigation;
+using App1.Helpers;
+using App1.Models;
 using CsvHelper;
 using CsvHelper.Configuration;
 
@@ -27,7 +29,7 @@ namespace App1
         private OmnivaLocation _currentModel;
         private List<OmnivaLocation> _models;
         private Bounds _visibleArea;
-
+       
         public MainPage()
         {
             InitializeComponent();
@@ -84,8 +86,21 @@ namespace App1
                 sRead = new StreamReader(await file.OpenStreamForReadAsync());
             }
             SetMyLocation();
+            GetLocations(sRead);
+        }
 
-            DrawLocations(sRead);
+
+        private Bounds GetBounds()
+        {
+            GeoboundingBox geoBox = myMap.GetBounds();
+            Bounds result = new Bounds
+            {
+                East = geoBox.SoutheastCorner.Longitude,
+                North = geoBox.NorthwestCorner.Latitude,
+                West = geoBox.NorthwestCorner.Longitude,
+                South = geoBox.SoutheastCorner.Latitude
+            };
+            return result;
         }
 
         private async void UpdateFile()
@@ -101,7 +116,7 @@ namespace App1
             await sWrite.WriteAsync(sRead.ReadToEnd());
         }
 
-        private void DrawLocations(StreamReader sRead)
+        private void GetLocations(StreamReader sRead)
         {
             var configuration = new CsvConfiguration {Delimiter = ";"};
             _models = new List<OmnivaLocation>();
@@ -129,20 +144,28 @@ namespace App1
                     _models.Add(location);
                 }
             }
+        }
 
+
+        private void DrawLocations()
+        {
+           // Bounds visibleBounds = GetBounds();
             if (myMap.Children.Count != 0)
             {
-                var pushpin = myMap.Children.FirstOrDefault(p => (p.GetType() == typeof (OmnivaLocation)));
+                var pushpin = myMap.Children.FirstOrDefault(p => (p.GetType() == typeof(OmnivaLocation)));
 
                 if (pushpin != null)
                     myMap.Children.Remove(pushpin);
             }
-
+            if (_models == null)
+                return;
+            int i = 0;
             foreach (var model in _models.Where(x => x.CountryCode == "EE"))
-                SetPin(model);
+            //foreach (var model in _models.Where(x => x.IsPointInside(visibleBounds)))
+                SetPin(model);  
         }
 
-        private void SetPin(OmnivaLocation location, bool myLocation = false)
+        private void SetPin(BaseLocation location, bool myLocation = false)
         {
             string iconPath;
             if (myLocation)
@@ -155,6 +178,9 @@ namespace App1
                     break;
                 case 1:
                     iconPath = "ms-appx:///Assets/omniva_p_location.png";
+                    break;
+                case 99:
+                    iconPath = "ms-appx:///Assets/youarehere.png";
                     break;
                 default:
                     iconPath = "ms-appx:///Assets/location-icon.png";
@@ -193,9 +219,16 @@ namespace App1
                 position.Latitude = geoposition.Coordinate.Latitude;
                 position.Longitude = geoposition.Coordinate.Longitude;
             #endif
-                //SetPin(position.Latitude, position.Longitude, "You are here", 3,true);
+                BaseLocation myLocation = new BaseLocation()
+                {
+                    XCoordinate = position.Longitude,
+                    YCoordinate = position.Latitude,
+                    Name = "You are here",
+                    Type = 99
+                };
+               // SetPin(myLocation);
                 myMap.Center = new Geopoint(position);
-                myMap.ZoomLevel = 18;
+                myMap.ZoomLevel = 15;
             }
             catch (Exception ex)
             {
@@ -223,29 +256,16 @@ namespace App1
 
         private void btnZoomIn_Click(object sender, RoutedEventArgs e)
         {
-            if (myMap.ZoomLevel < 20)
+            if (myMap.ZoomLevel < 25)
                 myMap.ZoomLevel = ++myMap.ZoomLevel;
+
         }
 
         private void btnZoomOut_Click(object sender, RoutedEventArgs e)
         {
-            if (myMap.ZoomLevel > 1)
+            if (myMap.ZoomLevel > 3)
                 myMap.ZoomLevel = --myMap.ZoomLevel;
         }
-
-        //private void Pushpin_Tapped(object sender, TappedRoutedEventArgs e)
-        //{
-        //    ShowPushpinContent((OmnivaLocation) sender);
-        //}
-
-        //private void ShowPushpinContent(OmnivaLocation model)
-        //{
-        //    PushpinPopup.IsOpen = false;
-        //    PushpinPopup.DataContext = model;
-        //    PushpinPopup.IsOpen = true;
-        //    myMap.Center = model.Location;
-        //    // _currentModel = model;
-        //}
 
         private async void btnSearh_Click(object sender, RoutedEventArgs e)
         {
@@ -255,44 +275,31 @@ namespace App1
             if (!string.IsNullOrWhiteSpace(seachString))
             {
                 myMap.MapElements.Clear();
-                var filteredLocations =
+                List<OmnivaLocation> filteredLocations =
                     _models.Where(x => x.Name.ToLower().Contains(seachString)).ToList();
-                foreach (var model in filteredLocations)
+                foreach (OmnivaLocation model in filteredLocations)
                     SetPin(model);
 
                 if (filteredLocations.Count==1)
                 {
-                    var position = new BasicGeoposition
+                    BasicGeoposition position = new BasicGeoposition
                     {
                         Latitude = filteredLocations[0].YCoordinate,
                         Longitude = filteredLocations[0].XCoordinate
                     };
                     myMap.Center = new Geopoint(position);
-                    myMap.ZoomLevel = 18;
+                    myMap.ZoomLevel = 15;
                 }
             }
         }
 
         private void myMap_ZoomLevelChanged(MapControl sender, object args)
         {
-            //todo count models in bounds
-            //   if (_models == null) return;
-
-            //   if (MapBoundsArea != null)
-            //     {
-            //int count = _models.Count(location => location.IsPointInside(_visibleArea));
-            //btnCount.Label = count.ToString();
-            //   }
+            DrawLocations();
         }
 
 
-        public class Bounds
-        {
-            public double East { get; set; }
-            public double West { get; set; }
-            public double North { get; set; }
-            public double South { get; set; }
-        }
+
 
 
         private void BtnUpdate_OnClick(object sender, RoutedEventArgs e)

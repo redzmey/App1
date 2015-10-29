@@ -24,22 +24,5 @@
     </Page.BottomAppBar>
 
     <Maps:MapControl x:Name="myMap"
-                      MapServiceToken="AsCaoqoc5VNLKNJhChJvgyez0XSgG6ge2O39m-TgkpgZ38hYRszjKfJBtfzuXDtz" Margin="0" ZoomLevelChanged="myMap_ZoomLevelChanged">
-        <Popup x:Name="PushpinPopup" IsLightDismissEnabled="True" DataContext="{Binding}" Tag="{Binding}">
-            <Border BorderBrush="#F08D45" BorderThickness="1">
-                <Grid Background="White" Width="300"  >
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
-                    <StackPanel Grid.Row="0" Background="#F08D45">
-                        <TextBlock Grid.Row="0" Foreground="White" FontSize="16" FontWeight="Bold" Text="{Binding Name}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="10" />
-                    </StackPanel>
-                    <StackPanel Grid.Row="1" Orientation="Vertical" Margin="15">
-
-                    </StackPanel>
-                </Grid>
-            </Border>
-        </Popup>
-    </Maps:MapControl>
+                      MapServiceToken="AsCaoqoc5VNLKNJhChJvgyez0XSgG6ge2O39m-TgkpgZ38hYRszjKfJBtfzuXDtz" Margin="0" ZoomLevelChanged="myMap_ZoomLevelChanged" ZoomLevel="15"/>
 </Page>

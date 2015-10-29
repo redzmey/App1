@@ -1,9 +1,11 @@
-﻿namespace App1
+﻿using System;
+
+namespace App1.Models
 {
     public class OmnivaLocation : BaseLocation
     {
         public string Zip { get; set; }
-        public int Type { get; set; }
+        
         public string CountryCode { get; set; }
         public string A1Name { get; set; }
         public string A2Name { get; set; }
@@ -24,5 +26,7 @@
         public string CommentLav { get; set; }
         public string CommentLit { get; set; }
         public string Modified { get; set; }
+
+        public string FullAddress => string.Join(Environment.NewLine,A1Name, A2Name, A3Name, A4Name, A5Name, A6Name, A7Name,A8Name).Replace(Environment.NewLine + "NULL","");
     }
 }

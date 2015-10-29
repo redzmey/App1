@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
+using App1.Models;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -22,9 +23,9 @@ namespace App1
     public sealed partial class LocationPin : UserControl
     {
         private string imagePath;
-        private OmnivaLocation _details;
+        private BaseLocation _details;
 
-        public OmnivaLocation Details
+        public BaseLocation Details
         {
             get { return _details; }
             set
