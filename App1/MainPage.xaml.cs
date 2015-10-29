@@ -80,7 +80,7 @@ namespace App1
             }
             else
             {
-                var file = await StorageFile.GetFileFromApplicationUriAsync(new Uri(@"ms-appx:///OmnivaLocations.csv"));
+                var file = await StorageFile.GetFileFromApplicationUriAsync(new Uri(@"ms-appx:///DataFiles/OmnivaLocations.csv"));
                 sRead = new StreamReader(await file.OpenStreamForReadAsync());
             }
             SetMyLocation();
@@ -96,7 +96,7 @@ namespace App1
             var places = await client.GetStringAsync("http://www.omniva.ee/locations.csv");
             var sRead = new StreamReader(GenerateStreamFromString(places));
 
-            var file = await StorageFile.GetFileFromApplicationUriAsync(new Uri(@"ms-appx:///OmnivaLocations.csv"));
+            var file = await StorageFile.GetFileFromApplicationUriAsync(new Uri(@"ms-appx:///DataFiles/OmnivaLocations.csv"));
             var sWrite = new StreamWriter(await file.OpenStreamForWriteAsync());
             await sWrite.WriteAsync(sRead.ReadToEnd());
         }
@@ -294,14 +294,18 @@ namespace App1
             public double South { get; set; }
         }
 
-        private void btnCount_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
 
         private void BtnUpdate_OnClick(object sender, RoutedEventArgs e)
         {
            UpdateFile();
+        }
+
+        private void BtnGetall_OnClick(object sender, RoutedEventArgs e)
+        {
+            //List<OmnivaLocation> a = _models;
+            //var listPage = new LocationsListPage(_models);
+            //listPage.
+            Frame.Navigate(typeof(LocationsListPage), _models);
         }
     }
 }

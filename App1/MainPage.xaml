@@ -17,6 +17,7 @@
         </CommandBar.PrimaryCommands>
             <CommandBar.SecondaryCommands>
             <AppBarButton x:Name="btnSearh" Icon="Find" Label="Search" Click="btnSearh_Click"/>
+                <AppBarButton x:Name="btnGetall" Icon="Find" Label="View all" Click="BtnGetall_OnClick"/>
                 <AppBarButton x:Name="btnUpdate" Label="Update" Click="BtnUpdate_OnClick"/>
             </CommandBar.SecondaryCommands>
             </CommandBar>

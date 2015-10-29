@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.Devices.Geolocation;
-
-namespace App1
+﻿namespace App1
 {
-    public class OmnivaLocation: BaseLocation
+    public class OmnivaLocation : BaseLocation
     {
         public string Zip { get; set; }
         public int Type { get; set; }
@@ -31,7 +24,5 @@ namespace App1
         public string CommentLav { get; set; }
         public string CommentLit { get; set; }
         public string Modified { get; set; }
-
     }
 }
-

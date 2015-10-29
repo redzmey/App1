@@ -13,13 +13,6 @@
 
         <Image Tag="{Binding id}" Source="/Assets/location-icon.png" Stretch="None"  
                x:Name="imgmarker" HorizontalAlignment="Left" >
-            <!--<Toolkit:ContextMenuService.ContextMenu>
-                <Toolkit:ContextMenu  IsZoomEnabled="True" 
-                                        Style="{StaticResource MenuStyle}" >
-                    <Toolkit:MenuItem Tag="{Binding id}" Name="Menuitem"
-                               Style="{StaticResource MenuItemStyle}" />
-                </Toolkit:ContextMenu>
-            </Toolkit:ContextMenuService.ContextMenu>-->
         </Image>
     </StackPanel>
 </UserControl>

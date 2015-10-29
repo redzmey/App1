@@ -27,11 +27,11 @@ namespace App1
     {
         private NavigationHelper navigationHelper;
         private ObservableDictionary defaultViewModel = new ObservableDictionary();
-
+        public List<OmnivaLocation> _LocationsList; 
         public LocationsListPage()
         {
             this.InitializeComponent();
-
+          
             this.navigationHelper = new NavigationHelper(this);
             this.navigationHelper.LoadState += this.NavigationHelper_LoadState;
             this.navigationHelper.SaveState += this.NavigationHelper_SaveState;
@@ -99,6 +99,9 @@ namespace App1
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             this.navigationHelper.OnNavigatedTo(e);
+
+            _LocationsList = (List<OmnivaLocation>) e.Parameter;
+            listView.ItemsSource = _LocationsList;
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -107,5 +110,30 @@ namespace App1
         }
 
         #endregion
+
+        private void btnFilterEE_Click(object sender, RoutedEventArgs e)
+        {
+            listView.ItemsSource= FilterList("EE");
+        }
+
+        private List<OmnivaLocation> FilterList(string countyCode)
+        {
+            return _LocationsList.Where(x => x.CountryCode == countyCode).ToList();
+        }
+
+        private void btnFilterLV_Click(object sender, RoutedEventArgs e)
+        {
+            listView.ItemsSource = FilterList("LV");
+        }
+
+        private void btnFilterLT_Click(object sender, RoutedEventArgs e)
+        {
+            listView.ItemsSource = FilterList("LT");
+        }
+
+        private void stpLocationDetail_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            ((Frame)Window.Current.Content).Navigate(typeof(DetailsPage), listView.SelectedItem);
+        }
     }
 }

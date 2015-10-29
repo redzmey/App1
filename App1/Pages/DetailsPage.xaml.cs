@@ -1,17 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using App1.Common;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
@@ -23,9 +15,10 @@ namespace App1
     public sealed partial class DetailsPage : Page
     {
         private OmnivaLocation _details;
+
         public DetailsPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         /// <summary>
@@ -41,6 +34,18 @@ namespace App1
                 tbxDescription.Text = _details.Name;
                 tbxServiceHours.Text = _details.ServiceHours;
             }
+        }
+
+        private void btnNavigateTo_Click(object sender, RoutedEventArgs e)
+        {
+            Uri driveToUri = new Uri($"ms-drive-to:?destination.latitude={_details.YCoordinate}&destination.longitude={_details.XCoordinate}&destination.name={_details.Name}");
+
+            Launcher.LaunchUriAsync(driveToUri);
+        }
+
+        private void btnBack_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
