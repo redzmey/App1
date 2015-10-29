@@ -87,6 +87,7 @@ namespace App1
             }
             SetMyLocation();
             GetLocations(sRead);
+            DrawLocations();
         }
 
 
@@ -295,7 +296,7 @@ namespace App1
 
         private void myMap_ZoomLevelChanged(MapControl sender, object args)
         {
-            DrawLocations();
+            
         }
 
 
