@@ -43,7 +43,6 @@ namespace App1
         private void btnNavigateTo_Click(object sender, RoutedEventArgs e)
         {
             Uri driveToUri = new Uri($"ms-drive-to:?destination.latitude={_details.YCoordinate}&destination.longitude={_details.XCoordinate}&destination.name={_details.Name}");
-
             Launcher.LaunchUriAsync(driveToUri);
         }
 

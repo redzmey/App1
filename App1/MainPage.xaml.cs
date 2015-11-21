@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Windows.Devices.Geolocation;
 using Windows.Foundation;
 using Windows.Networking.Connectivity;
 using Windows.Storage;
+using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Maps;
@@ -16,6 +18,7 @@ using App1.Helpers;
 using App1.Models;
 using CsvHelper;
 using CsvHelper.Configuration;
+using Newtonsoft.Json;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=391641
 
@@ -89,7 +92,17 @@ namespace App1
             GetLocations(sRead);
             DrawLocations();
         }
-
+        private async Task<OmnivaJson> ReadJson()
+        {
+            StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+            var textFile = await localFolder.OpenStreamForReadAsync("omnivaLocations.json");
+            using (var streamReader = new StreamReader(textFile))
+            {
+                var reader = new JsonTextReader(streamReader).ToString();
+                return JsonConvert.DeserializeObject<OmnivaJson>(reader);
+            }
+            
+        }
 
         private Bounds GetBounds()
         {
@@ -117,9 +130,9 @@ namespace App1
             await sWrite.WriteAsync(sRead.ReadToEnd());
         }
 
-        private void GetLocations(StreamReader sRead)
+        private async void GetLocations(StreamReader sRead)
         {
-            var configuration = new CsvConfiguration {Delimiter = ";"};
+            var configuration = new CsvConfiguration { Delimiter = ";" };
             _models = new List<OmnivaLocation>();
             using (var reader = new CsvReader(sRead, configuration))
             {
@@ -132,21 +145,36 @@ namespace App1
                         XCoordinate = reader.GetField<double>("X_COORDINATE"),
                         YCoordinate = reader.GetField<double>("Y_COORDINATE"),
                         CountryCode = reader.GetField("A0_NAME"),
-                        A1Name = reader.GetField("A1_NAME"),
-                        A2Name = reader.GetField("A2_NAME"),
-                        A3Name = reader.GetField("A3_NAME"),
-                        A4Name = reader.GetField("A4_NAME"),
-                        A5Name = reader.GetField("A5_NAME"),
-                        A6Name = reader.GetField("A6_NAME"),
-                        A7Name = reader.GetField("A7_NAME"),
+                        FullAddress = string.Join(Environment.NewLine, reader.GetField("A1_NAME"), reader.GetField("A2_NAME"), reader.GetField("A3_NAME"), reader.GetField("A4_NAME"), reader.GetField("A5_NAME"), reader.GetField("A6_NAME"), reader.GetField("A7_NAME"), reader.GetField("A8_NAME")).Replace(Environment.NewLine + "NULL", ""),
                         Type = reader.GetField<int>("TYPE"),
                         ServiceHours = reader.GetField("SERVICE_HOURS"),
                     };
                     _models.Add(location);
                 }
             }
+            await SaveJson();
         }
 
+        private async System.Threading.Tasks.Task SaveJson()
+        {
+            OmnivaJson newOmnivaJson = new OmnivaJson
+            {
+                Updated = DateTime.Now,
+                Locations = _models
+            };
+            string jsonContents = JsonConvert.SerializeObject(newOmnivaJson, Formatting.Indented);
+            StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+            StorageFile textFile = await localFolder.CreateFileAsync("omnivaLocations.json",
+                                         CreationCollisionOption.ReplaceExisting);
+            using (IRandomAccessStream textStream = await textFile.OpenAsync(FileAccessMode.ReadWrite))
+            {
+                using (DataWriter textWriter = new DataWriter(textStream))
+                {
+                    textWriter.WriteString(jsonContents);
+                    await textWriter.StoreAsync();
+                }
+            }
+        }
 
         private void DrawLocations()
         {
