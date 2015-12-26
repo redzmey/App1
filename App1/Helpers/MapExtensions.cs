@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.Devices.Geolocation;
+﻿using Windows.Devices.Geolocation;
 using Windows.UI.Xaml.Controls.Maps;
 
 namespace App1.Helpers
@@ -20,7 +15,7 @@ namespace App1.Helpers
             }
             catch
             {
-                var topOfMap = new Geopoint(new BasicGeoposition()
+                Geopoint topOfMap = new Geopoint(new BasicGeoposition
                 {
                     Latitude = 85,
                     Longitude = 0
@@ -38,7 +33,7 @@ namespace App1.Helpers
             }
             catch
             {
-                var bottomOfMap = new Geopoint(new BasicGeoposition()
+                Geopoint bottomOfMap = new Geopoint(new BasicGeoposition
                 {
                     Latitude = -85,
                     Longitude = 0

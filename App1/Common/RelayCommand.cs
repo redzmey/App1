@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace App1.Common
@@ -16,13 +12,8 @@ namespace App1.Common
     /// </summary>
     public class RelayCommand : ICommand
     {
-        private readonly Action _execute;
         private readonly Func<bool> _canExecute;
-
-        /// <summary>
-        /// Raised when RaiseCanExecuteChanged is called.
-        /// </summary>
-        public event EventHandler CanExecuteChanged;
+        private readonly Action _execute;
 
         /// <summary>
         /// Creates a new command that can always execute.
@@ -41,7 +32,7 @@ namespace App1.Common
         public RelayCommand(Action execute, Func<bool> canExecute)
         {
             if (execute == null)
-                throw new ArgumentNullException("execute");
+                throw new ArgumentNullException(nameof(execute));
             _execute = execute;
             _canExecute = canExecute;
         }
@@ -55,8 +46,13 @@ namespace App1.Common
         /// <returns>true if this command can be executed; otherwise, false.</returns>
         public bool CanExecute(object parameter)
         {
-            return _canExecute == null ? true : _canExecute();
+            return _canExecute?.Invoke() ?? true;
         }
+
+        /// <summary>
+        /// Raised when RaiseCanExecuteChanged is called.
+        /// </summary>
+        public event EventHandler CanExecuteChanged;
 
         /// <summary>
         /// Executes the <see cref="RelayCommand"/> on the current command target.
@@ -76,11 +72,8 @@ namespace App1.Common
         /// </summary>
         public void RaiseCanExecuteChanged()
         {
-            var handler = CanExecuteChanged;
-            if (handler != null)
-            {
-                handler(this, EventArgs.Empty);
-            }
+            EventHandler handler = CanExecuteChanged;
+            handler?.Invoke(this, EventArgs.Empty);
         }
     }
 }

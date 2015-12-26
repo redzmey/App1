@@ -3,12 +3,11 @@ using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
-using App1.Common;
 using App1.Models;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
-namespace App1
+namespace App1.Pages
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
@@ -20,6 +19,17 @@ namespace App1
         public DetailsPage()
         {
             InitializeComponent();
+        }
+
+        private void btnBack_Click(object sender, RoutedEventArgs e)
+        {
+            Frame.GoBack();
+        }
+
+        private async void btnNavigateTo_Click(object sender, RoutedEventArgs e)
+        {
+            Uri driveToUri = new Uri($"ms-drive-to:?destination.latitude={_details.YCoordinate}&destination.longitude={_details.XCoordinate}&destination.name={_details.Name}");
+            await Launcher.LaunchUriAsync(driveToUri);
         }
 
         /// <summary>
@@ -38,17 +48,6 @@ namespace App1
                 tbxFullAddress.Text = _details.FullAddress;
                 tbxServiceHours.Text = _details.ServiceHours;
             }
-        }
-
-        private void btnNavigateTo_Click(object sender, RoutedEventArgs e)
-        {
-            Uri driveToUri = new Uri($"ms-drive-to:?destination.latitude={_details.YCoordinate}&destination.longitude={_details.XCoordinate}&destination.name={_details.Name}");
-            Launcher.LaunchUriAsync(driveToUri);
-        }
-
-        private void btnBack_Click(object sender, RoutedEventArgs e)
-        {
-            Frame.GoBack();
         }
     }
 }

@@ -1,58 +1,62 @@
-﻿using App1.Common;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Graphics.Display;
-using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using App1.Common;
 using App1.Models;
 
 // The Basic Page item template is documented at http://go.microsoft.com/fwlink/?LinkID=390556
 
-namespace App1
+namespace App1.Pages
 {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
     public sealed partial class LocationsListPage : Page
     {
-        private NavigationHelper navigationHelper;
-        private ObservableDictionary defaultViewModel = new ObservableDictionary();
-        public List<OmnivaLocation> _LocationsList; 
+        public List<OmnivaLocation> _LocationsList;
+
         public LocationsListPage()
         {
-            this.InitializeComponent();
-          
-            this.navigationHelper = new NavigationHelper(this);
-            this.navigationHelper.LoadState += this.NavigationHelper_LoadState;
-            this.navigationHelper.SaveState += this.NavigationHelper_SaveState;
-        }
+            InitializeComponent();
 
-        /// <summary>
-        /// Gets the <see cref="NavigationHelper"/> associated with this <see cref="Page"/>.
-        /// </summary>
-        public NavigationHelper NavigationHelper
-        {
-            get { return this.navigationHelper; }
+            NavigationHelper = new NavigationHelper(this);
+            NavigationHelper.LoadState += NavigationHelper_LoadState;
+            NavigationHelper.SaveState += NavigationHelper_SaveState;
         }
 
         /// <summary>
         /// Gets the view model for this <see cref="Page"/>.
         /// This can be changed to a strongly typed view model.
         /// </summary>
-        public ObservableDictionary DefaultViewModel
+        public ObservableDictionary DefaultViewModel { get; } = new ObservableDictionary();
+
+        /// <summary>
+        /// Gets the <see cref="NavigationHelper"/> associated with this <see cref="Page"/>.
+        /// </summary>
+        public NavigationHelper NavigationHelper { get; }
+
+        private void btnFilterEE_Click(object sender, RoutedEventArgs e)
         {
-            get { return this.defaultViewModel; }
+            listView.ItemsSource = FilterList("EE");
+        }
+
+        private void btnFilterLT_Click(object sender, RoutedEventArgs e)
+        {
+            listView.ItemsSource = FilterList("LT");
+        }
+
+        private void btnFilterLV_Click(object sender, RoutedEventArgs e)
+        {
+            listView.ItemsSource = FilterList("LV");
+        }
+
+        private List<OmnivaLocation> FilterList(string countyCode)
+        {
+            return _LocationsList.Where(x => x.CountryCode == countyCode).ToList();
         }
 
         /// <summary>
@@ -82,6 +86,11 @@ namespace App1
         {
         }
 
+        private void stpLocationDetail_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            ((Frame) Window.Current.Content).Navigate(typeof (DetailsPage), listView.SelectedItem);
+        }
+
         #region NavigationHelper registration
 
         /// <summary>
@@ -99,7 +108,7 @@ namespace App1
         /// handlers that cannot cancel the navigation request.</param>
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            this.navigationHelper.OnNavigatedTo(e);
+            NavigationHelper.OnNavigatedTo(e);
 
             _LocationsList = (List<OmnivaLocation>) e.Parameter;
             listView.ItemsSource = _LocationsList;
@@ -107,34 +116,9 @@ namespace App1
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
-            this.navigationHelper.OnNavigatedFrom(e);
+            NavigationHelper.OnNavigatedFrom(e);
         }
 
         #endregion
-
-        private void btnFilterEE_Click(object sender, RoutedEventArgs e)
-        {
-            listView.ItemsSource= FilterList("EE");
-        }
-
-        private List<OmnivaLocation> FilterList(string countyCode)
-        {
-            return _LocationsList.Where(x => x.CountryCode == countyCode).ToList();
-        }
-
-        private void btnFilterLV_Click(object sender, RoutedEventArgs e)
-        {
-            listView.ItemsSource = FilterList("LV");
-        }
-
-        private void btnFilterLT_Click(object sender, RoutedEventArgs e)
-        {
-            listView.ItemsSource = FilterList("LT");
-        }
-
-        private void stpLocationDetail_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            ((Frame)Window.Current.Content).Navigate(typeof(DetailsPage), listView.SelectedItem);
-        }
     }
 }
